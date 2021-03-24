@@ -11,7 +11,6 @@ from functools import wraps
 import email_validator
 from flask_gravatar import Gravatar
 from smtplib import SMTP
-import os
 import config
 my_email = config.EMAIL
 

@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField
 from wtforms.validators import DataRequired, URL, Email, EqualTo
 from flask_ckeditor import CKEditorField
+import email_validator
 
 ##WTForm
 class CreatePostForm(FlaskForm):
@@ -13,7 +14,7 @@ class CreatePostForm(FlaskForm):
 
 class UserForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
-    email = StringField("Email", validators=[DataRequired(), Email()])
+    email = StringField("Email", validators=[DataRequired()])
     password = PasswordField("password", validators=[DataRequired(), EqualTo('confirm', message='Passwords must match')])
     confirm = PasswordField("Re-enter Password", validators=[DataRequired()])
     submit = SubmitField("SIGN ME UP!")
