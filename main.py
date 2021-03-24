@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, flash, abort
+from flask import Flask, render_template, redirect, url_for, flash, abort, request
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
 from datetime import date
@@ -10,7 +10,13 @@ from forms import CreatePostForm, UserForm, LoginForm, CommentForm
 from functools import wraps
 import email_validator
 from flask_gravatar import Gravatar
-import hashlib
+from smtplib import SMTP
+import os
+import config
+my_email = config.EMAIL
+
+password = config.PASSWORD
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
@@ -197,9 +203,26 @@ def about():
     return render_template("about.html")
 
 
-@app.route("/contact")
+
+@app.route("/contact", methods=["GET", "POST"])
 def contact():
-    return render_template("contact.html")
+    if request.method == "POST":
+        data = request.form
+        send_email(email=data["email"], name=data["name"], phone=data["phone"], message=data["message"])
+        return render_template("contact.html", sent=True)
+    else:
+        return render_template("contact.html", sent=False)
+
+
+def send_email(email, phone, message, name):
+    with SMTP("smtp.gmail.com", port=587) as connection:
+        connection.starttls()
+        connection.login(user=my_email, password=password)
+        connection.sendmail(from_addr=my_email,
+                            to_addrs="schlaud.jesse@gmail.com",
+                            msg=f'Subject:New message from blog reader.\n\nName: {name}\n'
+                                f'Email: {email}\nPhone: {phone}\nMessage: {message}'.encode('utf-8')
+                            )
 
 
 @app.route("/new-post", methods=["GET", "POST"])
