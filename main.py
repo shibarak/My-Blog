@@ -116,8 +116,12 @@ class User(db.Model, UserMixin):
             return NotImplemented
         return not equal
 
-db.create_all()
+# db.create_all()
 
+#  Makes the "current_year" variable available in every template!!!!
+@app.context_processor
+def inject_now():
+    return {'current_year': date.today().strftime("%Y")}
 
 def admin_only(f):
     @wraps(f)
@@ -281,6 +285,18 @@ def delete_post(post_id):
     db.session.commit()
     return redirect(url_for('get_all_posts'))
 
+
+@app.route("/delete/<int:post_id>/<int:comment_id>")
+@login_required
+@admin_only
+def delete_comment(comment_id, post_id):
+    post_to_delete = Comment.query.get(comment_id)
+    db.session.delete(post_to_delete)
+    db.session.commit()
+    return redirect(url_for('show_post', post_id=post_id))
+
+
+print(date.today().strftime("%Y"))
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
