@@ -19,12 +19,15 @@ password = config.PASSWORD
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
+app.config['SECRET_KEY'] = config.SECRET_KEY
 ckeditor = CKEditor(app)
 Bootstrap(app)
 
 ##CONNECT TO DB
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
+if os.environ.get("DATABASE_URL") == None:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -113,7 +116,7 @@ class User(db.Model, UserMixin):
             return NotImplemented
         return not equal
 
-# db.create_all()
+db.create_all()
 
 
 def admin_only(f):
